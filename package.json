@@ -1,0 +1,22 @@
+{
+  "name": "avro-typescript",
+  "version": "0.1.0",
+  "description": "Typed TypeScript wrapper around the OmicronLab Avro Phonetic Bangla transliteration engine + suggestion stack (MPL-1.1).",
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": { "types": "./dist/index.d.ts", "import": "./dist/index.js" },
+    "./vendor/*": "./src/vendor/*"
+  },
+  "files": ["dist", "src/vendor", "CREDITS.md", "LICENSE", "README.md"],
+  "scripts": {
+    "build": "tsc -p tsconfig.json"
+  },
+  "keywords": ["avro", "avro-phonetic", "bangla", "bengali", "transliteration", "omicronlab", "typescript"],
+  "license": "MPL-1.1",
+  "repository": { "type": "git", "url": "git+https://github.com/msi-shamim/avro-typescript.git" },
+  "devDependencies": {
+    "typescript": "^5.4.0"
+  }
+}
