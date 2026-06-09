@@ -1,0 +1,166 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>avro-typescript — live Avro Phonetic demo</title>
+  <meta name="description" content="Type Bangla phonetically (Avro) in the browser — live demo of avro-typescript, a typed wrapper around the OmicronLab Avro Phonetic engine (MPL-1.1)." />
+  <style>
+    :root{ --bg:#0f1419; --panel:#161b22; --line:#272e38; --me:#1f6feb; --bot:#21262d; --text:#e6edf3; --muted:#8b949e; --accent:#3fb950; }
+    *{ box-sizing:border-box }
+    body{ margin:0; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Noto Sans Bengali',sans-serif; background:var(--bg); color:var(--text); height:100vh; display:flex; flex-direction:column }
+    header{ padding:14px 18px; border-bottom:1px solid var(--line); display:flex; align-items:center; gap:12px; flex-wrap:wrap }
+    header h1{ font-size:16px; margin:0; font-weight:700 }
+    header .tag{ font-size:11px; color:var(--muted) }
+    header a{ color:var(--me); text-decoration:none; font-size:12px }
+    .status{ margin-left:auto; font-size:12px; color:var(--muted); display:flex; align-items:center; gap:6px }
+    .dot{ width:8px; height:8px; border-radius:50%; background:#d29922 }
+    .dot.ok{ background:var(--accent) }
+    main{ flex:1; overflow-y:auto; padding:18px; display:flex; flex-direction:column; gap:10px; max-width:760px; width:100%; margin:0 auto }
+    .msg{ max-width:78%; padding:10px 14px; border-radius:14px; line-height:1.5; font-size:15px; white-space:pre-wrap; word-wrap:break-word }
+    .msg.me{ align-self:flex-end; background:var(--me); color:#fff; border-bottom-right-radius:4px }
+    .msg.bot{ align-self:flex-start; background:var(--bot); border:1px solid var(--line); border-bottom-left-radius:4px }
+    .hint{ align-self:center; color:var(--muted); font-size:13px; text-align:center; max-width:520px; line-height:1.6 }
+    .hint code{ background:var(--panel); padding:1px 6px; border-radius:5px; color:var(--accent) }
+    footer{ border-top:1px solid var(--line); padding:12px 18px; max-width:760px; width:100%; margin:0 auto }
+    .suggest{ display:flex; gap:6px; margin-bottom:8px; flex-wrap:wrap; min-height:0 }
+    .suggest button{ background:var(--panel); border:1px solid var(--line); color:var(--text); border-radius:8px; padding:4px 10px; cursor:pointer; font-size:15px; font-family:inherit }
+    .suggest button:hover{ border-color:var(--me) }
+    .row{ display:flex; gap:10px; align-items:flex-end }
+    .toggle{ display:flex; align-items:center; gap:7px; font-size:13px; color:var(--muted); cursor:pointer; user-select:none; white-space:nowrap; padding-bottom:9px }
+    .toggle input{ display:none }
+    .switch{ width:38px; height:22px; background:var(--line); border-radius:11px; position:relative; transition:.15s }
+    .switch::after{ content:''; position:absolute; top:2px; left:2px; width:18px; height:18px; background:#fff; border-radius:50%; transition:.15s }
+    .toggle input:checked + .switch{ background:var(--accent) }
+    .toggle input:checked + .switch::after{ transform:translateX(16px) }
+    textarea{ flex:1; resize:none; background:var(--panel); border:1px solid var(--line); color:var(--text); border-radius:12px; padding:11px 14px; font-size:15px; font-family:inherit; line-height:1.4; max-height:120px; outline:none }
+    textarea:focus{ border-color:var(--me) }
+    .send{ background:var(--me); color:#fff; border:none; border-radius:12px; padding:0 18px; height:44px; font-size:15px; cursor:pointer; font-weight:600 }
+    .send:disabled{ opacity:.5; cursor:default }
+    .credit{ text-align:center; font-size:11px; color:var(--muted); padding:6px 18px 12px }
+    .credit a{ color:var(--muted) }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>⌨️ avro-typescript</h1>
+    <span class="tag">live Avro Phonetic demo</span>
+    <a href="https://github.com/msi-shamim/avro-typescript" target="_blank" rel="noopener">GitHub ↗</a>
+    <span class="status"><span class="dot" id="dot"></span><span id="statusText">loading engine…</span></span>
+  </header>
+
+  <main id="thread">
+    <div class="msg bot">নমস্কার! 👋 This is a live demo of <b>avro-typescript</b>. Turn on <b>Avro</b> below and type Bangla phonetically — e.g. type <code>ami banglay gan gai</code> → <b>আমি বাংলায় গান গাই</b>.</div>
+    <div class="hint">Toggle <b>Avro: On</b>, then type in Roman letters. Press <b>Space</b> to transliterate the word; tap a suggestion to pick a candidate. Send a message to see it echoed.</div>
+  </main>
+
+  <footer>
+    <div class="suggest" id="suggest"></div>
+    <div class="row">
+      <label class="toggle"><input type="checkbox" id="avroToggle" /><span class="switch"></span><span id="avroLabel">Avro: Off</span></label>
+      <textarea id="input" rows="1" placeholder="Type a message…" autocomplete="off"></textarea>
+      <button class="send" id="send">Send</button>
+    </div>
+  </footer>
+  <div class="credit">
+    Engine + dictionary © <a href="https://www.omicronlab.com" target="_blank" rel="noopener">OmicronLab</a> (jsAvroPhonetic / ibus-avro), MPL-1.1.
+    This demo only wraps it. See <a href="https://github.com/msi-shamim/avro-typescript/blob/main/CREDITS.md" target="_blank" rel="noopener">credits</a>.
+  </div>
+
+  <script src="./avro/avro-suggest.js"></script>
+  <script>
+  (function(){
+    var thread = document.getElementById('thread');
+    var input = document.getElementById('input');
+    var sendBtn = document.getElementById('send');
+    var toggle = document.getElementById('avroToggle');
+    var avroLabel = document.getElementById('avroLabel');
+    var suggestBox = document.getElementById('suggest');
+    var dot = document.getElementById('dot');
+    var statusText = document.getElementById('statusText');
+    var ready = false;
+
+    // Wait for the Avro stack (loaded by avro-suggest.js) to be ready.
+    function whenReady(){
+      if (window.AvroSuggest && window.AvroSuggest.ready) {
+        window.AvroSuggest.ready.then(function(){ ready = true; dot.classList.add('ok'); statusText.textContent = 'Avro engine ready'; })
+          .catch(function(){ statusText.textContent = 'engine failed to load'; });
+      } else { setTimeout(whenReady, 200); }
+    }
+    whenReady();
+
+    toggle.addEventListener('change', function(){
+      avroLabel.textContent = 'Avro: ' + (toggle.checked ? 'On' : 'Off');
+      clearSuggest();
+      if (toggle.checked && !ready) statusText.textContent = 'engine still loading…';
+    });
+
+    function clearSuggest(){ suggestBox.innerHTML = ''; }
+
+    function currentWord(){
+      var v = input.value, c = input.selectionStart;
+      var left = v.slice(0, c), m = left.match(/[A-Za-z]+$/);
+      return m ? { word:m[0], start:c - m[0].length, end:c } : null;
+    }
+
+    // Show Bangla candidate suggestions for the word being typed (Avro on).
+    function refreshSuggestions(){
+      clearSuggest();
+      if (!toggle.checked || !ready || !window.AvroSuggest) return;
+      var w = currentWord();
+      if (!w || w.word.length < 1) return;
+      var cands;
+      try { cands = window.AvroSuggest.suggest(w.word) || []; } catch(e){ cands = []; }
+      cands.slice(0, 8).forEach(function(cand){
+        var b = document.createElement('button');
+        b.textContent = cand;
+        b.onmousedown = function(e){ e.preventDefault(); pick(w, cand); };
+        suggestBox.appendChild(b);
+      });
+    }
+
+    function pick(w, cand){
+      try { window.AvroSuggest.commit(w.word, cand); } catch(e){}
+      input.value = input.value.slice(0, w.start) + cand + input.value.slice(w.end);
+      clearSuggest(); input.focus();
+    }
+
+    // On space: transliterate the just-typed Roman word to Bangla (deterministic engine).
+    input.addEventListener('keydown', function(e){
+      if (e.key === ' ' && toggle.checked && ready && window.AvroPhonetic) {
+        var w = currentWord();
+        if (w && w.word) {
+          var bangla = window.AvroPhonetic.parse(w.word);
+          if (bangla && bangla !== w.word) {
+            e.preventDefault();
+            input.value = input.value.slice(0, w.start) + bangla + ' ' + input.value.slice(w.end);
+            clearSuggest();
+          }
+        }
+      } else if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault(); send();
+      }
+    });
+    input.addEventListener('input', function(){ autosize(); refreshSuggestions(); });
+
+    function autosize(){ input.style.height='auto'; input.style.height = Math.min(input.scrollHeight,120)+'px'; }
+
+    function add(text, who){
+      var d = document.createElement('div'); d.className = 'msg ' + who; d.textContent = text;
+      thread.appendChild(d); thread.scrollTop = thread.scrollHeight;
+    }
+
+    function send(){
+      var t = input.value.trim(); if (!t) return;
+      add(t, 'me'); input.value=''; autosize(); clearSuggest();
+      // Tiny "chatbot" echo so it feels alive (no backend — purely client-side demo).
+      setTimeout(function(){
+        var hasBangla = /[ঀ-৿]/.test(t);
+        add(hasBangla ? 'বাহ্! আপনি বাংলায় লিখেছেন। 🎉  ("' + t + '")' : 'You typed: "' + t + '". Turn on Avro and try typing Bangla phonetically!', 'bot');
+      }, 350);
+    }
+    sendBtn.addEventListener('click', send);
+  })();
+  </script>
+</body>
+</html>

@@ -25,9 +25,16 @@ core engine and dictionary belongs to them.
   user's candidate picks in `localStorage` instead of a home-dir JSON file). The suggestion
   algorithm and behavior are OmicronLab's; the shim only bridges the module system.
 
-### 3. The Avro dictionary
-- **File:** `src/vendor/avrodict.js` — the OmicronLab Avro Bangla word/candidate tables.
-- **Copyright:** © **OmicronLab**, distributed under **MPL-1.1**.
+### 3. The Avro dictionary + suggestion stack
+- **Files:** `src/vendor/avrodict.js` (Bangla word/candidate tables), plus the suggestion modules
+  `dbsearch.js`, `suggestionbuilder.js`, `autocorrect.js`, `suffixdict.js`, `utf8.js`.
+- **Copyright:** © **OmicronLab**, distributed under **MPL-1.1** (the suggestion modules carry the
+  same MPL-1.1 headers as the engine).
+
+### 4. Damerau–Levenshtein distance
+- **File:** `src/vendor/levenshtein.js` — a JavaScript implementation of Damerau–Levenshtein distance,
+  used by the suggestion ranking. Originally from a public snippet
+  (<http://www.dzone.com/snippets/javascript-implementation>). Credit to its original author(s).
 
 ## Project home
 - **Avro Keyboard / OmicronLab:** <https://www.omicronlab.com>

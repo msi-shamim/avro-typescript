@@ -10,6 +10,10 @@ suggestion stack — ready to drop into a modern web app.
 > promise-based API, and TypeScript types. **Full credit and copyright for the Avro engine and data
 > belongs to OmicronLab.** See [CREDITS.md](./CREDITS.md).
 
+## 🚀 Live demo
+
+Try Avro typing in your browser: **https://msi-shamim.github.io/avro-typescript/** — toggle Avro on and type Bangla phonetically.
+
 ## What this gives you
 
 - ✅ **Transliteration** — Roman → Bangla, deterministically (`parse`)
