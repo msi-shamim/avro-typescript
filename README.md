@@ -1,14 +1,16 @@
-# avro-typescript
+# @msishamim/avro
 
-A small, **typed TypeScript wrapper** around the **Avro Phonetic** Bangla transliteration engine and
-suggestion stack — ready to drop into a modern web app.
+A **framework-agnostic, TypeScript-typed wrapper** that bundles the **complete** OmicronLab Avro
+Phonetic stack — the transliteration **engine + the full dictionary + the suggestion stack** — and
+makes it usable in any modern web app with a clean promise-based API.
 
-> **Credit where it's due.** The transliteration engine, regex/rule tables, and dictionary are the
-> work of **[OmicronLab](https://www.omicronlab.com)** (*jsAvroPhonetic* and *[ibus-avro](https://github.com/omicronlab/ibus-avro)*),
-> distributed under the **Mozilla Public License 1.1**. This repository **republishes that work
-> unmodified** (with its original MPL-1.1 headers intact) and adds only a browser loader, a clean
-> promise-based API, and TypeScript types. **Full credit and copyright for the Avro engine and data
-> belongs to OmicronLab.** See [CREDITS.md](./CREDITS.md).
+> **Credit where it's due.** The transliteration engine, regex/rule tables, dictionary, and
+> suggestion stack are the work of **[OmicronLab](https://www.omicronlab.com)**
+> (*jsAvroPhonetic* and *[ibus-avro](https://github.com/omicronlab/ibus-avro)*), distributed under
+> the **Mozilla Public License 1.1**. This repository **republishes that work unmodified** (with its
+> original MPL-1.1 headers intact) and adds only a browser loader, a clean promise-based API, and
+> TypeScript types. **Full credit and copyright for the Avro engine and data belongs to OmicronLab.**
+> See [CREDITS.md](./CREDITS.md).
 
 ## 🚀 Live demo
 
@@ -20,6 +22,23 @@ Try Avro typing in your browser: **https://msi-shamim.github.io/avro-typescript/
 - ✅ **Suggestions** — Bangla candidate words for a Roman word (`suggest`)
 - ✅ **Learning** — remember the user's chosen candidate (`commit`, persisted in `localStorage`)
 - ✅ **Types** — full TypeScript definitions, promise-based loader
+
+## What makes this one different
+
+Avro phonetic typing **is** available on npm in several forms (see [below](#see-also)) — this isn't
+the only option, and it isn't "the first." Where this package differs:
+
+- **The complete OmicronLab stack, bundled.** Most packages ship only the transliteration *engine*
+  (`parse`). This one also includes the **genuine OmicronLab dictionary (≈7 MB)** and the full
+  **suggestion stack** (`dbsearch` / `suggestionbuilder` / `autocorrect` / `suffixdict`), so
+  `suggest()` and `commit()` work out of the box — not just transliteration.
+- **Framework-agnostic.** No React (or any framework) dependency — `loadAvro()` works anywhere:
+  vanilla JS, Vue, Svelte, Angular, or React.
+- **Faithful republication.** The original OmicronLab files are vendored **unmodified** with their
+  **MPL-1.1 headers intact** and explicit attribution ([CREDITS.md](./CREDITS.md)).
+
+If you only need transliteration, or you specifically want a React hook/component, one of the
+alternatives below may suit you better.
 
 ## Install
 
@@ -60,6 +79,20 @@ avro.commit('bangla', 'বাংলা');       // remember the user's pick
 upstream GJS/GNOME Avro modules **unmodified** — stubbing the GNOME `imports`/`Gio`/`GLib` APIs and
 keeping the user's candidate picks in `localStorage` instead of a home-directory file. The engine
 (`avrolib.js`, `avroregexlib.js`) and the dictionary (`avrodict.js`) are OmicronLab's, untouched.
+
+## See also
+
+Other Avro / Bangla phonetic packages on npm — credit to their authors. Pick whatever fits your needs:
+
+- [`avro-phonetic`](https://www.npmjs.com/package/avro-phonetic) — JS implementation of jsAvroPhonetic (transliteration).
+- [`@subhesadek/avro-phonetic`](https://www.npmjs.com/package/@subhesadek/avro-phonetic) — TS/JS Avro Phonetic transliteration.
+- [`nodejs-avro-phonetic`](https://www.npmjs.com/package/nodejs-avro-phonetic) — Node implementation.
+- [`avro-bangla-engine`](https://www.npmjs.com/package/avro-bangla-engine) + [`avro-bangla-suggestions`](https://www.npmjs.com/package/avro-bangla-suggestions) — engine + a React hook for suggestions.
+- [`@blooomstech/react-avro-phonetic`](https://www.npmjs.com/package/@blooomstech/react-avro-phonetic) — a React component for phonetic typing.
+
+This package's niche: **framework-agnostic + the complete OmicronLab dictionary & suggestion stack
+bundled**, with faithful MPL-1.1 republication. If you only need transliteration, or a React-specific
+integration, one of the above may be a better fit.
 
 ## License
 
