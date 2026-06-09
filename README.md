@@ -24,7 +24,7 @@ Try Avro typing in your browser: **https://msi-shamim.github.io/avro-typescript/
 ## Install
 
 ```bash
-npm install @msi-shamim/avro
+npm install @msishamim/avro
 ```
 
 The vendored engine + dictionary live in `src/vendor/`. Serve those `*.js` files from a static path
@@ -33,7 +33,7 @@ The vendored engine + dictionary live in `src/vendor/`. Serve those `*.js` files
 ## Usage
 
 ```ts
-import { loadAvro } from '@msi-shamim/avro';
+import { loadAvro } from '@msishamim/avro';
 
 // basePath = the URL/dir that serves the vendored avro JS files (avro-suggest.js, avrolib.js, …)
 const avro = await loadAvro({ basePath: '/avro/' });

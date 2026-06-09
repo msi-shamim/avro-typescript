@@ -1,5 +1,5 @@
 {
-  "name": "@msi-shamim/avro",
+  "name": "@msishamim/avro",
   "version": "0.1.0",
   "description": "Typed TypeScript wrapper around the OmicronLab Avro Phonetic Bangla transliteration engine + suggestion stack (MPL-1.1).",
   "publishConfig": { "access": "public" },
