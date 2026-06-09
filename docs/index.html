@@ -125,17 +125,23 @@
       clearSuggest(); input.focus();
     }
 
-    // On space: transliterate the just-typed Roman word to Bangla (deterministic engine).
+    // Keys that "commit" the current word — Space and punctuation. Punctuation is run THROUGH the
+    // engine too, so '.' → '।' (dari), '?' → '?' etc. The engine maps Bangla punctuation correctly.
+    var COMMIT = { ' ':' ', '.':'.', ',':',', '?':'?', '!':'!', ';':';', ':':':' };
     input.addEventListener('keydown', function(e){
-      if (e.key === ' ' && toggle.checked && ready && window.AvroPhonetic) {
+      if (Object.prototype.hasOwnProperty.call(COMMIT, e.key) && toggle.checked && ready && window.AvroPhonetic) {
         var w = currentWord();
-        if (w && w.word) {
-          var bangla = window.AvroPhonetic.parse(w.word);
-          if (bangla && bangla !== w.word) {
-            e.preventDefault();
-            input.value = input.value.slice(0, w.start) + bangla + ' ' + input.value.slice(w.end);
-            clearSuggest();
-          }
+        // transliterate the just-typed Roman word + the trigger char together (so '.' becomes dari)
+        var roman = (w && w.word ? w.word : '') + e.key;
+        var bangla;
+        try { bangla = window.AvroPhonetic.parse(roman); } catch (err) { bangla = roman; }
+        if (bangla && bangla !== roman) {
+          e.preventDefault();
+          var start = w && w.word ? w.start : input.selectionStart;
+          var end = w && w.word ? w.end : input.selectionStart;
+          input.value = input.value.slice(0, start) + bangla + input.value.slice(end);
+          var pos = start + bangla.length; input.setSelectionRange(pos, pos);
+          clearSuggest();
         }
       } else if (e.key === 'Enter' && !e.shiftKey) {
         e.preventDefault(); send();
